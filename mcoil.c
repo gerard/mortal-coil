@@ -161,26 +161,34 @@ int play(int play_to) {
  * This is simply backtracking.
  */
 int look_for_path(int *v, int depth) {
-	if(move(PLAY_RIGHT) && play(PLAY_RIGHT) && look_for_path(v, depth+1)) {
-		v[depth] = PLAY_RIGHT;
-		return TRUE;
-	} else play(UNWIND_RIGHT);
+	if(move(PLAY_RIGHT) && play(PLAY_RIGHT)) {
+	 	if(look_for_path(v, depth+1)) {
+			v[depth] = PLAY_RIGHT;
+			return TRUE;
+		} else play(UNWIND_RIGHT);
+	}
 	
-	if(move(PLAY_DOWN) && play(PLAY_DOWN) && look_for_path(v, depth+1)) {
-		v[depth] = PLAY_DOWN;
-		return TRUE;
-	} else play(UNWIND_DOWN);
+	if(move(PLAY_DOWN) && play(PLAY_DOWN)) {
+		if(look_for_path(v, depth+1)) {
+			v[depth] = PLAY_DOWN;
+			return TRUE;
+		} else play(UNWIND_DOWN);
+	}
 	
-	if(move(PLAY_LEFT) && play(PLAY_LEFT) && look_for_path(v, depth+1)) {
-		v[depth] = PLAY_LEFT;
-		return TRUE;
-	} else play(UNWIND_LEFT);
+	if(move(PLAY_LEFT) && play(PLAY_LEFT)) {
+		if(look_for_path(v, depth+1)) {
+			v[depth] = PLAY_LEFT;
+			return TRUE;
+		} else play(UNWIND_LEFT);
+	}
 	
-	if(move(PLAY_UP) && play(PLAY_UP) && look_for_path(v, depth+1)) {
-		v[depth] = PLAY_UP;
-		return TRUE;
-	} else play(UNWIND_UP);
-	
+	if(move(PLAY_UP) && play(PLAY_UP)) {
+		if(look_for_path(v, depth+1)) {
+			v[depth] = PLAY_UP;
+			return TRUE;
+		} else play(UNWIND_UP);
+	}
+
 	/* No more movements. Lets see if we win or not... */
 	if(is_done()) {
 		print_sol();
