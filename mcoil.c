@@ -7,6 +7,7 @@
 #define AREA_BLOCKED 	(-1)
 #define AREA_CLEAR 		0
 
+#define AREA_NOW(t)				(t.field[t.x][t.y])
 #define AREA_RIGHT(t)			(t.field[t.x+1][t.y])
 #define AREA_DOWN(t)			(t.field[t.x][t.y+1])
 #define AREA_LEFT(t)			(t.field[t.x-1][t.y])
@@ -66,8 +67,8 @@ int is_done() {
 int print_sol() {
 	int i, j;
 	
-	for(i=0; i<g.size_x; i++) {
-		for(j=0; j<g.size_y; j++) printf("%2d", g.field[i][j]);
+	for(i=0; i<g.size_y; i++) {
+		for(j=0; j<g.size_x; j++) printf("%2d", g.field[j][i]);
 		printf("\n");
 	}
 	printf("\n");
@@ -139,7 +140,7 @@ int move(int play_to) {
 			AREA_DOWN(g) = AREA_CLEAR;
 			DEC_AREA;
 		}
-		MOVE_DOWN(g);
+		MOVE_UP(g);
 		return TRUE;
 	
 	default:
@@ -198,5 +199,7 @@ int look_for_path(int *v, int depth) {
 int main() {
 	int v[MAX_LEN_PATH];
 	
+	AREA_NOW(g) = NEXT_AREA;
+	INC_AREA;
 	return look_for_path(v, 0);
 }
