@@ -13,10 +13,11 @@
 #define AREA_LEFT(t)		(t.field[t.x-1][t.y])
 #define AREA_UP(t)		(t.field[t.x][t.y-1])
 
+/* Check whether the position is *outside* the field */
 #define CHECK_BOUNDS_RIGHT(t) 	(t.x+1 >= t.size_x)
 #define CHECK_BOUNDS_DOWN(t) 	(t.y+1 >= t.size_y)
-#define CHECK_BOUNDS_LEFT(t) 	(t.x-1 >= t.size_x)
-#define CHECK_BOUNDS_UP(t)	(t.y-1 >= t.size_y)
+#define CHECK_BOUNDS_LEFT(t) 	(t.x-1 < 0)
+#define CHECK_BOUNDS_UP(t)	(t.y-1 < 0)
 
 #define MOVE_RIGHT(t)		(t.x++)
 #define MOVE_DOWN(t)		(t.y++)
@@ -92,7 +93,7 @@ int move(int play_to) {
 			INC_AREA;
 		} else { /* UNWIND_LEFT */
 			if(AREA_RIGHT(g) != PREV_AREA) return FALSE;
-			AREA_RIGHT(g) = AREA_CLEAR;
+			AREA_NOW(g) = AREA_CLEAR;
 			DEC_AREA;
 		}
 		MOVE_RIGHT(g);
@@ -107,7 +108,7 @@ int move(int play_to) {
 			INC_AREA;
 		} else { /* UNWIND_UP */
 			if(AREA_DOWN(g) != PREV_AREA) return FALSE;
-			AREA_DOWN(g) = AREA_CLEAR;
+			AREA_NOW(g) = AREA_CLEAR;
 			DEC_AREA;
 		}
 		MOVE_DOWN(g);
@@ -122,7 +123,7 @@ int move(int play_to) {
 			INC_AREA;
 		} else { /* UNWIND_RIGHT */
 			if(AREA_LEFT(g) != PREV_AREA) return FALSE;
-			AREA_LEFT(g) = AREA_CLEAR;
+			AREA_NOW(g) = AREA_CLEAR;
 			DEC_AREA;
 		}
 		MOVE_LEFT(g);
@@ -136,8 +137,8 @@ int move(int play_to) {
 			AREA_UP(g) = NEXT_AREA;
 			INC_AREA;
 		} else { /* UNWIND_DOWN */
-			if(AREA_DOWN(g) != PREV_AREA) return FALSE;
-			AREA_DOWN(g) = AREA_CLEAR;
+			if(AREA_UP(g) != PREV_AREA) return FALSE;
+			AREA_NOW(g) = AREA_CLEAR;
 			DEC_AREA;
 		}
 		MOVE_UP(g);
@@ -194,6 +195,12 @@ int look_for_path(int *v, int depth) {
 	if(is_done()) {
 		print_sol();
 	}
+	
+	/* 
+	 * We return FALSE always when we reach this point to obtain all the
+	 * possible solutions.
+	 */
+	return FALSE;
 }
 
 int main() {
