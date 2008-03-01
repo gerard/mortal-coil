@@ -1,1 +1,3 @@
 mcoil
+*.o
+.gdb_history

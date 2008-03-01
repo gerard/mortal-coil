@@ -1,5 +1,7 @@
 #include <stdio.h>
-#include "mcoil.h"
+#include <stdlib.h>
+
+#include "defs.h"
 
 int mc_parsefile(const char *file, struct game *g) {
 	FILE *f;
@@ -7,14 +9,17 @@ int mc_parsefile(const char *file, struct game *g) {
 	char c;
 	
 	f = fopen(file, "r");
+	if(!f) return FALSE;
+	
 	fscanf(f, "%dx%d\n", &(g->x), &(g->y));
 	
 	/* 
 	 * FIXME: This is a bit screwed up: The matrix is not filled in the
 	 * same order that we would need to allocate it.
 	 */
-	g->fields = (int **)malloc(sizeof(int *)*(g->x));
-	for(i=0; i < (g->x); i++) g->fields = (int *)malloc(sizeof(int)*(g->y))
+	g->field = (int **)malloc(sizeof(int *)*(g->x));
+	for(i=0; i < (g->x); i++)
+		g->field[i] = (int *)malloc(sizeof(int)*(g->y));
 	
 	for(i=0; i < (g->y); i++) {
 		for(j=0; j < (g->x); j++) {
@@ -33,7 +38,7 @@ int mc_parsefile(const char *file, struct game *g) {
 		}
 		
 		/* We expect '\n' here */
-		if(getc() != '\n') return FALSE;
+		if(getc(f) != '\n') return FALSE;
 	}
 	
 	/* Succesfully parsed! */

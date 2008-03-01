@@ -1,11 +1,13 @@
 #include <stdio.h>
+
+#include "defs.h"
+#include "parse.h"
+
 #define MAX_LEN_PATH 		256
 #define INC_AREA 		(++area_count)
 #define DEC_AREA		(--area_count)
 #define PREV_AREA 		(area_count-1)
 #define NEXT_AREA		(area_count+1)
-#define AREA_BLOCKED 		(-1)
-#define AREA_CLEAR 		0
 
 #define AREA_NOW(t)		(t.field[t.x][t.y])
 #define AREA_RIGHT(t)		(t.field[t.x+1][t.y])
@@ -33,19 +35,6 @@ enum moves {
 	UNWIND_UP,
 	UNWIND_RIGHT,
 	UNWIND_DOWN
-};
-
-enum boolean {
-	FALSE = 0,
-	TRUE
-};
-
-struct game {
-	int **field;
-	int size_x;		/* This would be the field size */
-	int size_y;
-	int x;			/* This is the actual position */
-	int y;
 };
 
 struct game g;
@@ -203,9 +192,17 @@ int look_for_path(int *v, int depth) {
 	return FALSE;
 }
 
-int main() {
+int main(int argc, char *argv[]) {
 	int v[MAX_LEN_PATH];
 	
+	/* Switch to getopt as soon as we have more choices!! */
+	if(argc != 2) {
+		fprintf(stderr, "Usage: %s filename\n", argv[0]);
+		return 1;
+	}
+
+	if(mc_parsefile(argv[1], &g));
+
 	AREA_NOW(g) = NEXT_AREA;
 	INC_AREA;
 	return look_for_path(v, 0);
