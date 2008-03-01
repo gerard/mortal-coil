@@ -1,7 +1,9 @@
-all: mcoil
+objects = mcoil.o 
 
-mcoil: mcoil.c
-	gcc mcoil.c -o mcoil
+mcoil: $(objects)
+	$(CC) $< -o $@
 
-clean: 
-	rm -f mcoil
+clean:
+	rm -f mcoil $(objects)
+
+.PHONY: clean
