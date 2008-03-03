@@ -66,6 +66,25 @@ int print_sol() {
 	return TRUE;
 }
 
+int print_sol_v(int v[], int x, int y) {
+	int i;
+	printf("(%d,%d) ", x, y);
+	for(i=0; v[i] != 0; i++) {
+		switch(v[i]) {
+		case PLAY_LEFT:         printf("L"); break;
+		case PLAY_DOWN:         printf("D"); break;
+		case PLAY_RIGHT:        printf("R"); break;
+		case PLAY_UP:           printf("U"); break;
+		default:
+			fprintf(stderr, "ERROR: Unreachable condition\n");
+			return FALSE;
+		}
+	}
+	
+	printf("\n");
+	return TRUE;
+}
+
 /* 
  * Takes the direction to move and return either TRUE (success) or false.
  * Note that it only moves ONE area.
