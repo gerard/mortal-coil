@@ -39,6 +39,7 @@ enum moves {
 
 struct game g;
 int area_count = 0;
+int start_x, start_y;
 
 /* Test whether we win or not */
 
@@ -168,41 +169,47 @@ int play(int play_to) {
 
 /*
  * Returns whether it found the path or not (stored in v).
- * This is simply backtracking.
+ * This is simply backtracking. For each direction we:
+ * o Try to move one step, and then the whole way
+ * o Mark the direction in the vector
+ * o Recursively look in that direction
+ * o Unwind our movements
+ * o Remove the direction mark in the vector
+ * 
+ * Note that unless we return TRUE at the end, this function will never return
+ * TRUE, as all the other cases are conditional to a recursive call.
  */
 int look_for_path(int *v, int depth) {
 	if(move(PLAY_RIGHT) && play(PLAY_RIGHT)) {
-	 	if(look_for_path(v, depth+1)) {
-			v[depth] = PLAY_RIGHT;
-			return TRUE;
-		} else play(UNWIND_RIGHT);
+	 	v[depth] = PLAY_RIGHT;
+		if(look_for_path(v, depth+1)) return TRUE;
+		else play(UNWIND_RIGHT);
+		v[depth] = 0;
 	}
 	
 	if(move(PLAY_DOWN) && play(PLAY_DOWN)) {
-		if(look_for_path(v, depth+1)) {
-			v[depth] = PLAY_DOWN;
-			return TRUE;
-		} else play(UNWIND_DOWN);
+		v[depth] = PLAY_DOWN;
+		if(look_for_path(v, depth+1)) return TRUE;
+		else play(UNWIND_DOWN);
+		v[depth] = 0;
 	}
 	
 	if(move(PLAY_LEFT) && play(PLAY_LEFT)) {
-		if(look_for_path(v, depth+1)) {
-			v[depth] = PLAY_LEFT;
-			return TRUE;
-		} else play(UNWIND_LEFT);
+		v[depth] = PLAY_LEFT;
+		if(look_for_path(v, depth+1)) return TRUE;
+		else play(UNWIND_LEFT);
+		v[depth] = 0;
 	}
 	
 	if(move(PLAY_UP) && play(PLAY_UP)) {
-		if(look_for_path(v, depth+1)) {
-			v[depth] = PLAY_UP;
-			return TRUE;
-		} else play(UNWIND_UP);
+		v[depth] = PLAY_UP;
+		if(look_for_path(v, depth+1)) return TRUE;
+		else play(UNWIND_UP);
+		v[depth] = 0;
 	}
 
 	/* No more movements. Lets see if we win or not... */
-	if(is_done()) {
-		print_sol();
-	}
+	if(is_done()) print_sol_v(v, start_x, start_y);
 	
 	/* 
 	 * We return FALSE always when we reach this point to obtain all the
@@ -238,8 +245,8 @@ int main(int argc, char *argv[]) {
 		for(j=0; j<g.size_y; j++) {
 			if(g.field[i][j] == AREA_CLEAR) {
 				reset_game();
-				g.x = i;
-				g.y = j;
+				g.x = start_x = i;
+				g.y = start_y = j;
 				area_count = 0;
 				AREA_NOW(g) = NEXT_AREA;
 				INC_AREA;
