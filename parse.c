@@ -11,21 +11,21 @@ int mc_parsefile(const char *file, struct game *g) {
 	f = fopen(file, "r");
 	if(!f) return FALSE;
 	
-	fscanf(f, "%dx%d\n", &(g->x), &(g->y));
+	if(fscanf(f, "%dx%d\n", &(g->size_x), &(g->size_y)) != 2) return FALSE;
 	
 	/* 
 	 * FIXME: This is a bit screwed up: The matrix is not filled in the
 	 * same order that we would need to allocate it.
 	 */
-	g->field = (int **)malloc(sizeof(int *)*(g->x));
-	for(i=0; i < (g->x); i++)
-		g->field[i] = (int *)malloc(sizeof(int)*(g->y));
+	g->field = (int **)malloc(sizeof(int *)*(g->size_x));
+	for(i=0; i < (g->size_x); i++)
+		g->field[i] = (int *)malloc(sizeof(int)*(g->size_y));
 	
-	for(i=0; i < (g->y); i++) {
-		for(j=0; j < (g->x); j++) {
+	for(i=0; i < (g->size_y); i++) {
+		for(j=0; j < (g->size_x); j++) {
 			c = getc(f);
 			switch(c) {
-			case 'x':
+			case '#':
 				g->field[j][i] = AREA_BLOCKED;
 				break;
 			

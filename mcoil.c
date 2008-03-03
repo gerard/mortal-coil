@@ -192,18 +192,40 @@ int look_for_path(int *v, int depth) {
 	return FALSE;
 }
 
+void reset_game() {
+	int i, j;
+
+	area_count = 0;
+	for(i=0; i<g.size_x; i++) {
+		for(j=0; j<g.size_y; j++) {
+			if(g.field[i][j] > 0) g.field[i][j] = 0;
+		}
+	}
+}
+
 int main(int argc, char *argv[]) {
 	int v[MAX_LEN_PATH];
-	
+	int i, j;	
+
 	/* Switch to getopt as soon as we have more choices!! */
 	if(argc != 2) {
 		fprintf(stderr, "Usage: %s filename\n", argv[0]);
 		return 1;
 	}
 
-	if(mc_parsefile(argv[1], &g));
+	if(!mc_parsefile(argv[1], &g)) return 2;
 
-	AREA_NOW(g) = NEXT_AREA;
-	INC_AREA;
-	return look_for_path(v, 0);
+	for(i=0; i<g.size_x; i++) {
+		for(j=0; j<g.size_y; j++) {
+			if(g.field[i][j] == AREA_CLEAR) {
+				reset_game();
+				g.x = i;
+				g.y = j;
+				AREA_NOW(g) = NEXT_AREA;
+				look_for_path(v, 0);
+			}
+		}
+	}
+
+	return 0;
 }
