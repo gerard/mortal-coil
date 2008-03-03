@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <strings.h>
 
 #include "defs.h"
 #include "parse.h"
@@ -77,7 +78,7 @@ int print_sol_v(int v[], int x, int y) {
 		case PLAY_RIGHT:        printf("R"); break;
 		case PLAY_UP:           printf("U"); break;
 		default:
-			fprintf(stderr, "ERROR: Unreachable condition\n");
+			fprintf(stderr, "ERROR: Unreachable condition: %x\n", v[i]);
 			return FALSE;
 		}
 	}
@@ -239,6 +240,7 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 
+	bzero(v, MAX_LEN_PATH);
 	if(!mc_parsefile(argv[1], &g)) return 2;
 
 	for(i=0; i<g.size_x; i++) {
