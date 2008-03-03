@@ -81,7 +81,7 @@ int move(int play_to) {
 			AREA_RIGHT(g) = NEXT_AREA;
 			INC_AREA;
 		} else { /* UNWIND_LEFT */
-			if(AREA_RIGHT(g) != PREV_AREA) return FALSE;
+			if(AREA_NOW(g) == 1 || AREA_RIGHT(g) != PREV_AREA) return FALSE;
 			AREA_NOW(g) = AREA_CLEAR;
 			DEC_AREA;
 		}
@@ -96,7 +96,7 @@ int move(int play_to) {
 			AREA_DOWN(g) = NEXT_AREA;
 			INC_AREA;
 		} else { /* UNWIND_UP */
-			if(AREA_DOWN(g) != PREV_AREA) return FALSE;
+			if(AREA_NOW(g) == 1 || AREA_DOWN(g) != PREV_AREA) return FALSE;
 			AREA_NOW(g) = AREA_CLEAR;
 			DEC_AREA;
 		}
@@ -111,7 +111,7 @@ int move(int play_to) {
 			AREA_LEFT(g) = NEXT_AREA;
 			INC_AREA;
 		} else { /* UNWIND_RIGHT */
-			if(AREA_LEFT(g) != PREV_AREA) return FALSE;
+			if(AREA_NOW(g) == 1 || AREA_LEFT(g) != PREV_AREA) return FALSE;
 			AREA_NOW(g) = AREA_CLEAR;
 			DEC_AREA;
 		}
@@ -126,7 +126,7 @@ int move(int play_to) {
 			AREA_UP(g) = NEXT_AREA;
 			INC_AREA;
 		} else { /* UNWIND_DOWN */
-			if(AREA_UP(g) != PREV_AREA) return FALSE;
+			if(AREA_NOW(g) == 1 || AREA_UP(g) != PREV_AREA) return FALSE;
 			AREA_NOW(g) = AREA_CLEAR;
 			DEC_AREA;
 		}
@@ -221,7 +221,9 @@ int main(int argc, char *argv[]) {
 				reset_game();
 				g.x = i;
 				g.y = j;
+				area_count = 0;
 				AREA_NOW(g) = NEXT_AREA;
+				INC_AREA;
 				look_for_path(v, 0);
 			}
 		}
