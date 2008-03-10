@@ -3,6 +3,6 @@
 
 #include "defs.h"
 
-int mc_parsefile(const char *file, struct game *g);
+int mc_parsefile(const char *file);
 
 #endif

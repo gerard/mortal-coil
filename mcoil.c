@@ -3,29 +3,9 @@
 
 #include "defs.h"
 #include "parse.h"
+#include "game.h"
 
 #define MAX_LEN_PATH 		256
-#define INC_AREA 		(++area_count)
-#define DEC_AREA		(--area_count)
-#define PREV_AREA 		(area_count-1)
-#define NEXT_AREA		(area_count+1)
-
-#define AREA_NOW(t)		(t.field[t.x][t.y])
-#define AREA_RIGHT(t)		(t.field[t.x+1][t.y])
-#define AREA_DOWN(t)		(t.field[t.x][t.y+1])
-#define AREA_LEFT(t)		(t.field[t.x-1][t.y])
-#define AREA_UP(t)		(t.field[t.x][t.y-1])
-
-/* Check whether the position is *outside* the field */
-#define CHECK_BOUNDS_RIGHT(t) 	(t.x+1 >= t.size_x)
-#define CHECK_BOUNDS_DOWN(t) 	(t.y+1 >= t.size_y)
-#define CHECK_BOUNDS_LEFT(t) 	(t.x-1 < 0)
-#define CHECK_BOUNDS_UP(t)	(t.y-1 < 0)
-
-#define MOVE_RIGHT(t)		(t.x++)
-#define MOVE_DOWN(t)		(t.y++)
-#define MOVE_LEFT(t)		(t.x--)
-#define MOVE_UP(t)		(t.y--)
 
 enum moves {
 	PLAY_LEFT = 1,
@@ -38,8 +18,6 @@ enum moves {
 	UNWIND_DOWN
 };
 
-struct game g;
-int area_count = 0;
 int start_x, start_y;
 
 /* Test whether we win or not */
@@ -47,23 +25,11 @@ int start_x, start_y;
 int is_done() {
 	int i, j;
 	
-	for(i=0; i<g.size_x; i++) {
-		for(j=0; j<g.size_y; j++) {
-			if(g.field[i][j] == 0) return FALSE;
+	for(i=0; i<game_size_x(); i++) {
+		for(j=0; j<game_size_y(); j++) {
+			if(area_in(i,j) == AREA_CLEAR) return FALSE;
 		}
 	}
-	
-	return TRUE;
-}
-
-int print_sol() {
-	int i, j;
-	
-	for(i=0; i<g.size_y; i++) {
-		for(j=0; j<g.size_x; j++) printf("%2d", g.field[j][i]);
-		printf("\n");
-	}
-	printf("\n");
 	
 	return TRUE;
 }
@@ -90,68 +56,55 @@ int print_sol_v(int v[], int x, int y) {
 /* 
  * Takes the direction to move and return either TRUE (success) or false.
  * Note that it only moves ONE area.
- * PS: I hope you don't mind if I shout too much :D
  */
 int move(int play_to) {
 	switch(play_to) {
 	case PLAY_RIGHT:
 	case UNWIND_LEFT:
-		if(CHECK_BOUNDS_RIGHT(g)) return FALSE;
+		if(check_bounds_right()) return FALSE;
 		if(play_to == PLAY_RIGHT) {
-			if(AREA_RIGHT(g) != AREA_CLEAR) return FALSE;
-			AREA_RIGHT(g) = NEXT_AREA;
-			INC_AREA;
+			if(area_right() != AREA_CLEAR) return FALSE;
+			next_area_set_right();
 		} else { /* UNWIND_LEFT */
-			if(AREA_NOW(g) == 1 || AREA_RIGHT(g) != PREV_AREA) return FALSE;
-			AREA_NOW(g) = AREA_CLEAR;
-			DEC_AREA;
+			if(area_now() == 1 || area_right() != prev_area()) return FALSE;
+			prev_area_cl_right();
 		}
-		MOVE_RIGHT(g);
 		return TRUE;
 	
 	case PLAY_DOWN:
 	case UNWIND_UP:
-		if(CHECK_BOUNDS_DOWN(g)) return FALSE;
+		if(check_bounds_down()) return FALSE;
 		if(play_to == PLAY_DOWN) {
-			if(AREA_DOWN(g) != AREA_CLEAR) return FALSE;
-			AREA_DOWN(g) = NEXT_AREA;
-			INC_AREA;
+			if(area_down() != AREA_CLEAR) return FALSE;
+			next_area_set_down();
 		} else { /* UNWIND_UP */
-			if(AREA_NOW(g) == 1 || AREA_DOWN(g) != PREV_AREA) return FALSE;
-			AREA_NOW(g) = AREA_CLEAR;
-			DEC_AREA;
+			if(area_now() == 1 || area_down() != prev_area()) return FALSE;
+			prev_area_cl_down();
 		}
-		MOVE_DOWN(g);
 		return TRUE;
 	
 	case PLAY_LEFT:
 	case UNWIND_RIGHT:
-		if(CHECK_BOUNDS_LEFT(g)) return FALSE;
+		if(check_bounds_left()) return FALSE;
 		if(play_to == PLAY_LEFT) {
-			if(AREA_LEFT(g) != AREA_CLEAR) return FALSE;
-			AREA_LEFT(g) = NEXT_AREA;
-			INC_AREA;
+			if(area_left() != AREA_CLEAR) return FALSE;
+			next_area_set_left();
 		} else { /* UNWIND_RIGHT */
-			if(AREA_NOW(g) == 1 || AREA_LEFT(g) != PREV_AREA) return FALSE;
-			AREA_NOW(g) = AREA_CLEAR;
-			DEC_AREA;
+			if(area_now() == 1 || area_left() != prev_area()) return FALSE;
+			prev_area_cl_left();
 		}
-		MOVE_LEFT(g);
 		return TRUE;
 	
 	case PLAY_UP:
 	case UNWIND_DOWN:
-		if(CHECK_BOUNDS_UP(g)) return FALSE;
+		if(check_bounds_up()) return FALSE;
 		if(play_to == PLAY_UP) {
-			if(AREA_UP(g) != AREA_CLEAR) return FALSE;
-			AREA_UP(g) = NEXT_AREA;
-			INC_AREA;
+			if(area_up() != AREA_CLEAR) return FALSE;
+			next_area_set_up();
 		} else { /* UNWIND_DOWN */
-			if(AREA_NOW(g) == 1 || AREA_UP(g) != PREV_AREA) return FALSE;
-			AREA_NOW(g) = AREA_CLEAR;
-			DEC_AREA;
+			if(area_now() == 1 || area_up() != prev_area()) return FALSE;
+			prev_area_cl_up();
 		}
-		MOVE_UP(g);
 		return TRUE;
 	
 	default:
@@ -219,17 +172,6 @@ int look_for_path(int *v, int depth) {
 	return FALSE;
 }
 
-void reset_game() {
-	int i, j;
-
-	area_count = 0;
-	for(i=0; i<g.size_x; i++) {
-		for(j=0; j<g.size_y; j++) {
-			if(g.field[i][j] > 0) g.field[i][j] = 0;
-		}
-	}
-}
-
 int main(int argc, char *argv[]) {
 	int v[MAX_LEN_PATH];
 	int i, j;	
@@ -241,21 +183,18 @@ int main(int argc, char *argv[]) {
 	}
 
 	bzero(v, MAX_LEN_PATH);
-	if(!mc_parsefile(argv[1], &g)) return 2;
+	if(!mc_parsefile(argv[1])) return 2;
 
-	for(i=0; i<g.size_x; i++) {
-		for(j=0; j<g.size_y; j++) {
-			if(g.field[i][j] == AREA_CLEAR) {
-				reset_game();
-				g.x = start_x = i;
-				g.y = start_y = j;
-				area_count = 0;
-				AREA_NOW(g) = NEXT_AREA;
-				INC_AREA;
+	for(i=0; i<game_size_x(); i++) {
+		for(j=0; j<game_size_y(); j++) {
+			if(area_in(i, j) == AREA_CLEAR) {
+				start_x = i;
+				start_y = j;
+				reset_game(i, j);
 				look_for_path(v, 0);
 			}
 		}
 	}
-
+	
 	return 0;
 }
