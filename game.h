@@ -36,3 +36,4 @@ int init_game(int **f, int sx, int sy);
 void reset_game(int x, int y);
 
 #endif
+
